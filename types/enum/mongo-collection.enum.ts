@@ -1,0 +1,32 @@
+enum MongoCollections {
+    AURA_ORDERS = 'aura_orders',
+    LISTING = 'nft_listing',
+    OFFERS = 'offers',
+    CATEGORY = 'category',
+    TOKEN_PROPERTIES = 'token_properties',
+    NOTIFICATION = 'notifications',
+    ORDERS = 'orders',
+    NFT_DETAILS = 'nft_details',
+    GAMES = 'games',
+    GAMES_CONFIG = 'game_config',
+    GAMES_VOTE = 'game_vote',
+    MASTHEAD = 'masthead_games',
+    FEATURED_GAMES = 'featured_games',
+    ERC20_META = 'erc20_meta',
+    CONFIG = 'config',
+    FUTURE_GAMES = 'future_games',
+    GAME_DETAILS = 'game_details',
+    NOTIFICATION_RULES = 'rule_book',
+    USERS_PROFILE = 'users_profile',
+    PegaxyRaces = 'pegaxy_races',
+    PegaxyRaceResults = 'pegaxy_race_results',
+    GAMES_COLLECTION = 'games_collection',
+    Quiz_Details = 'quiz_details',
+    COLLECTION_STATS = 'collection_stats',
+    HOME_PAGE = 'home_page',
+    MIXED_NFT = 'mixed_nft',
+    NFT_ORDERS = 'nft_orders',
+  }
+  
+  export default MongoCollections;
+  

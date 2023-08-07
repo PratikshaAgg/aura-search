@@ -46,23 +46,48 @@ export default class SearchNftUtils {
   };
 
   public getNftPipeline = (
-    query: any,
+    input: string,
     pageSize: number,
     page: number,
     contractAddress?: RegExp[],
     sort?: any
   ) => {
     return [
-      { $match: query },
-      //   {
-      //     $search: {
-      //       index: "nft_name",
-      //       autocomplete: {
-      //         path: "name",
-      //         query: input,
-      //       },
-      //     },
-      //   },
+      {
+        $search: {
+          index: "default",
+          compound: {
+            should: [
+              {
+                autocomplete: {
+                  query: input,
+                  path: "name",
+                  fuzzy: {
+                    maxEdits: 2,
+                    prefixLength: 3,
+                  },
+                  score: {
+                    boost: {
+                      value: 5,
+                    },
+                  },
+                },
+              },
+              {
+                text: {
+                  query: input,
+                  path: "token_id",
+                  score: {
+                    boost: {
+                      value: 10,
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
       {
         $skip: page * pageSize,
       },
@@ -76,8 +101,9 @@ export default class SearchNftUtils {
           token_id: 1,
           contract_address: 1,
           name: 1,
-          image: 1,
-          data: 1,
+          image_url: 1,
+          image_properties: 1,
+          extra_metadata: 1,
           game_slug: 1,
           collection_slug: 1,
         },
@@ -97,9 +123,35 @@ export default class SearchNftUtils {
       {
         $search: {
           index: "game_name_index",
-          autocomplete: {
-            path: "game_name",
-            query: input,
+          compound: {
+            should: [
+              {
+                text: {
+                  query: input,
+                  path: "game_name",
+                  score: {
+                    boost: {
+                      value: 10, // Boosting exact matches
+                    },
+                  },
+                },
+              },
+              {
+                autocomplete: {
+                  query: input,
+                  path: "game_name",
+                  fuzzy: {
+                    maxEdits: 2,
+                    prefixLength: 3,
+                  },
+                  score: {
+                    boost: {
+                      value: 5, // Boosting autocomplete suggestions
+                    },
+                  },
+                },
+              },
+            ],
           },
         },
       },
@@ -126,9 +178,9 @@ export default class SearchNftUtils {
         $group: {
           _id: "$_id",
           game_name: { $first: "$game_name" },
+          score: { $first: "$score" },
           game_slug: { $first: "$game_slug" },
           contract_address: { $push: "$contract_address" },
-          score: { $first: "$score" },
         },
       },
       { $sort: { score: -1 } },

@@ -5,14 +5,17 @@ import SearchRepository from "../repository/search.repository";
 import { STATUS_CODES } from "http";
 import { ResponseText, StatusCode } from "../types/enum/response.enum";
 import infoLogs, { LogTypes } from "../utils/logger.untils";
+import { ResponseFormat } from "../types/interface/response.interface";
+import { Method } from "../types/enum/method.enum";
+import { RouteName } from "../types/enum/route-name.enum";
 
 export default class NftDetailsController {
-  nftService: NftSearchService;
+  searchService: NftSearchService;
   searchUtils: SearchNftUtils;
   repository: SearchRepository;
 
   constructor() {
-    this.nftService = new NftSearchService();
+    this.searchService = new NftSearchService();
     this.searchUtils = new SearchNftUtils();
     this.repository = new SearchRepository();
   }
@@ -23,23 +26,30 @@ export default class NftDetailsController {
    * @param req
    * @param res
    */
-  public globalSearch = async (req: Request, res: Response) => {
+  public execute = async (req: Request, res: Response) => {
     try {
-      const { input } = req.query;
-      const pageSize = parseInt(req.query.pageSize as string);
-      const page = parseInt(req.query.page as string);
-      const query = { $text: { $search: input } };
-      const globalSearchPipeline = this.searchUtils.globalSearchPipeline(
-        input as string,
-        page,
-        pageSize
+      const method = req.method;
+      const routeName = req.path.split("/")[1];
+      infoLogs(
+        `HTTP method: ${method}, Route name: ${routeName} -Search`,
+        LogTypes.INFO
       );
-      const pipeline = this.searchUtils.getNftPipeline(query, pageSize, page);
-      const [collections, items] = await Promise.all([
-        await this.repository.searchGames(globalSearchPipeline),
-        await this.repository.findNameGlobal(pipeline),
-      ]);
-      res.status(StatusCode.OK).send({ success: true, response: {collections, items } });
+      let response: ResponseFormat = {
+        success: false,
+      };
+      if (Method.GET === method) {
+        if (routeName === RouteName.GLOBAL) {
+          const { input } = req.query;
+          const pageSize = parseInt(req.query.pageSize as string);
+          const page = parseInt(req.query.page as string);
+          response = await this.searchService.globalSearch(
+            input as string,
+            pageSize,
+            page
+          );
+        }
+      }
+      res.status(StatusCode.OK).send(response);
     } catch (err) {
       infoLogs(
         `${ResponseText.INTERNAL_ERROR}: ${JSON.stringify(err)}`,
@@ -50,5 +60,4 @@ export default class NftDetailsController {
         .send({ success: false, message: ResponseText.INTERNAL_ERROR });
     }
   };
-
 }

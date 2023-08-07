@@ -7,6 +7,7 @@ enum MongoCollections {
     NOTIFICATION = 'notifications',
     ORDERS = 'orders',
     NFT_DETAILS = 'nft_details',
+    NFT_TEMP = 'nft_temp',
     GAMES = 'games',
     GAMES_CONFIG = 'game_config',
     GAMES_VOTE = 'game_vote',

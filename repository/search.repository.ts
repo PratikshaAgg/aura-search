@@ -16,15 +16,13 @@ export default class SearchRepository {
       .toArray();
   };
 
-  public searchGames = async (
-    pipeline: any
-  ) => {
+  public searchGames = async (pipeline: any) => {
     return db.collection(MongoCollections.GAMES).aggregate(pipeline).toArray();
   };
 
-  public findNameGlobal = async (pipeline: any) => {
+  public findNameTokenGlobal = async (pipeline: any) => {
     return db
-      .collection(MongoCollections.NFT_DETAILS)
+      .collection(MongoCollections.NFT_TEMP)
       .aggregate(pipeline)
       .toArray();
   };
